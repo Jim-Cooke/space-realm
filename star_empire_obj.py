@@ -6,21 +6,12 @@ import math
 
 player = ["X  "]
 turns = []
-# owner = []
-# loc_x = [] 
-# loc_y = []
-# loc_z = []
-# res_prod = []
-# res = [] 
-# ap = []
-# pop = [] 
-# ind = []
-# ind_prod = []
-# ships = []
+
 # object
 class Worlds:
-    def __init__(self, owner, loc_x, loc_y, loc_z, res_prd, res, ap, pop, ind,
+    def __init__(self, wrld_num, owner, loc_x, loc_y, loc_z, res_prd, res, ap, pop, ind,
                  ind_prd, ships)
+    self.wrld_num = wrld_num
     self.owner = owner
     self.loc_x = loc_x
     self.loc_y = loc_y
@@ -46,39 +37,6 @@ def random_1 ():
 
 # print(random_1())
 
-def change_worlds ():
-    #print("Wld  Ownr    X     Y     Z  Rp  Res  A+P  Pop  Ind  IP  Sh")
-    for n in range(0, wpp*nop):
-        # animals and plants increase, less likely if high ind
-        if ap[n] > 0:
-            rap = random_1()*3
-            if rap < 1:
-                ap[n] = ap[n] - 1
-            else:
-                if rap < 2:    
-                    ap[n] = int((ap[n]*rap*3/(ind[n] + 1))
-                else:
-                    ap[n] = ap[n] + 1            
-            if ap[n] < 1:
-                ap[n] = 1
-        # resouces increase
-        if pop[n] > 0:
-            res[n] = res[n] + res_prod[n]
-        # pop consumes resources
-        res[n] = res[n] - pop[n]
-        # pop reduces if not enough resources
-        # pop increases if enough resources, less likely if high ind, only if some ap
-        if res[n] < 0:
-           res[n] = 0
-           pop[n] = pop[n] - 1
-        else:
-           if ap[n] > 0:                     
-               pop[n] = pop[n] + int(random_1()*3*pop[n]/(ind[n] + 1))
-        # ip
-        ind_prod[n] = min(res[n], pop[n], ind[n])
-        # print
-        #print(n, "  ", owner[n], " ", "{0:3d} : {1:3d} : {2:3d}".format(loc_x[n], loc_y[n], loc_z[n]), " " , res_prod[n],
-        #  " ", res[n], "  ", ap[n], "  ", pop[n], "  ", ind[n], "  ", ind_prod[n], " ", ships[n])
 
 # generate worlds
 # prompt for user imput
@@ -120,16 +78,51 @@ cube_side = (nop*wpp*27)**(1./3.)
 #        self.roll = roll 
    
 # creating list        
-#list = []  
+list = []  
   
 # appending instances to list  
 #list.append( geeks('Akash', 2) ) 
 #list.append( geeks('Deependra', 40) ) 
-#list.append( geeks('Reaper', 44) )                              
+#list.append( geeks('Reaper', 44) )
+
+#generate owners
+def gen_own (x):
+    global player[]
+    global nop
+    if x <= nop:
+        return player[x]
+    else:
+        return "X  "
+
+#generate locations
+def gen_loc ():
+    global cube_side
+    return int(random_1()*cube_side - cube_side/2)
+
+#generate resource production
+def gen_rprd ():
+    return int(random_1()*2 + 1)
+
+#generate resources
+def gen_res ():
+    return int(random_1()*2 + 1)
+
+#generate animals-plants
+def gen_ap (x):
+    global owner[]
+    if owner[x] != "X  ":
+        return int(random_1()*2 + 1)
+    else:
+        return 0
+    
+
+for n in range(0, wpp*nop):
+    list.append( Worlds(n, gen_own(n), gen_loc(), gen_loc(), gen_loc(), gen_rprd(), gen_res(), gen_ap(n),
+                        gen_pop(n), gen_ind(n), gen_indprd(n), gen_ships(n) )
                                 
 
 #print("Wld  Ownr    X     Y     Z  Rp  Res  A+P  Pop  Ind  IP  Sh")
-# generate worlds
+# generate worlds - non OOP method
 for n in range(0, wpp*nop):
     if n <= nop:
         owner.append(player[n])
