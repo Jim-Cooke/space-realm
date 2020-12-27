@@ -86,19 +86,18 @@ fleet = [1]
 nof = 1
 
 class armada :pass
-for n in range (0, nof):
-    fleet[n] = armada()
-    fleet[n].owner = "XXX"
-    fleet[n].locx = 0
-    fleet[n].locy = 0
-    fleet[n].locz = 0
-    fleet[n].dest_wrld = 0
-    fleet[n].dest_x = 0
-    fleet[n].dest_y = 0
-    fleet[n].dest_z = 0
-    fleet[n].ships = 0
-    fleet[n].cargo = 0
-    fleet[n].crg_type = "_"
+fleet[0] = armada()
+fleet[0].owner = "XXX"
+fleet[0].locx = 0
+fleet[0].locy = 0
+fleet[0].locz = 0
+fleet[0].dest_wrld = 0
+fleet[0].dest_x = 0
+fleet[0].dest_y = 0
+fleet[0].dest_z = 0
+fleet[0].ships = 0
+fleet[0].cargo = 0
+fleet[0].crg_type = "_"
 
 #display fleets function
 def display_flt (armada, nof):
@@ -110,4 +109,33 @@ def display_flt (armada, nof):
 
 #call display fleets function
 display_flt(armada, nof)
+
+#events
+event = [1]
+for n in range (1, nop*wpp+1):
+    event.append(n)
+
+#number of events
+noe = nop*wpp
+
+#events - planet production "prod", fleet arrives "arr"
+#time = -1 means unused event
+# planet or fleet number
+class turns :pass
+#seed event table with planet production events
+for n in range (1, noe+1):
+    event[n] = turns()
+    event[n].time = 1 + 2*random_1()
+    event[n].type = "prod"
+    event[n].number = n
+    
+#structure of game
+#choose player, player takes turn
+#   launching fleets puts events in table
+#move clock ahead random time 0-2 turns
+#check for events
+#    planet prod spawns new prod event 1 turn later
+#    fleets land
+#go back to choose player
+
     
