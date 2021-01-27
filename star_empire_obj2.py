@@ -6,12 +6,12 @@ import time
 import math
 
 player = ["XXX"]
-turns = []
+turns = [0]
 current_turn = 1
-current_player = "XXX"
+t_player = 0
 
 #my random function
-def random_1 ():
+def random_1():
     r = random.random()
     t = time.time()
     # print(r, " ", t)
@@ -68,7 +68,7 @@ for n in range (1, nop*wpp+1):
     planet[n].ind_prod = min(planet[n].res, planet[n].pop, planet[n].ind)
 
 #display worlds function
-def display_wrld (worlds, num):
+def display_wrld(worlds, num):
     print(" ")
     print("Wld  Ownr     X    Y    Z   Rp  Res A+P Pop Ind IP Sh")
     for n in range (1, num+1):
@@ -100,7 +100,7 @@ fleet[0].cargo = 0
 fleet[0].crg_type = "_"
 
 #display fleets function
-def display_flt (armada, nof):
+def display_flt(armada, nof):
     print(" ")
     print("Flt Ownr     X    Y    Z   Sh  Cargo")
     for n in range (0, nof):
@@ -137,5 +137,36 @@ for n in range (1, noe+1):
 #    planet prod spawns new prod event 1 turn later
 #    fleets land
 #go back to choose player
+
+end_game = "no"
+while end_game != "yes":
+    #choose new player
+    pl = 1 + int(nop * random_1())
+    if pl != t_player:
+        t_player = pl
+    else:
+        least_turns = turns[1]
+        least_pl = 1
+        for n in range (1, nop+1):
+            if turns[n] < least_turns:
+                least_turns = turns[n]
+                least_pl = n
+        t_player = least_pl
+    # menu
+    ch = 0
+    while ch != 1 and ch != 2:
+        print("Player", player[t_player], "take your turn.")
+        #print{"1.  End Game")
+        #print("2.  Take your turn")
+        ch = input("Enter a number")
+    
+        
+
+
+
+
+
+
+
 
     
