@@ -67,17 +67,6 @@ for n in range (1, nop*wpp+1):
         planet[n].ships = 0
     planet[n].ind_prod = min(planet[n].res, planet[n].pop, planet[n].ind)
 
-#display worlds function
-def display_wrld(worlds, num):
-    print(" ")
-    print("Wld  Ownr     X    Y    Z   Rp  Res A+P Pop Ind IP Sh")
-    for n in range (1, num+1):
-        pl_loc_line = '%4s %4s %4s' % (planet[n].locx, planet[n].locy, planet[n].locz)
-        print(n, "  ", planet[n].owner, " ",pl_loc_line, " ", planet[n].res_prod, " ", planet[n].res, " ", planet[n].ap,
-        " ", planet[n].pop, " ", planet[n].ind, " ", planet[n].ind_prod, " ", planet[n].ships) 
-
-#call display worlds function
-display_wrld(worlds, nop*wpp)
 
 #fleets
 fleet = [1]
@@ -109,6 +98,32 @@ def display_flt(armada, nof):
 
 #call display fleets function
 display_flt(armada, nof)
+
+#local fleets function
+#returns true if player has fleet in location of planet n
+def local_fleet(armada, worlds, lf_player, n, nof):
+    fl = 0
+    while fl < nof:
+        if fleet[fl].owner == lf_player:
+            if planet[n].locx == fleet[fl].locx and planet[n].locy == fleet[fl].locy and planet[n].locz == fleet[fl].locz:
+                return True
+        fl=fl+1    
+
+#display worlds function
+def display_wrld(armada, worlds, num, dw_player, nof):
+    print(" ")
+    print("Wld  Ownr     X    Y    Z   Rp  Res A+P Pop Ind IP Sh")
+    for n in range (1, num+1):
+        pl_loc_line = '%4s %4s %4s' % (planet[n].locx, planet[n].locy, planet[n].locz)
+        #print(n, "  ", planet[n].owner, " ",pl_loc_line, " ", planet[n].res_prod, " ", planet[n].res, " ", planet[n].ap,\
+        #" ", planet[n].pop, " ", planet[n].ind, " ", planet[n].ind_prod, " ", planet[n].ships)
+        pr_kn_wo_prd = '%3s %3s %3s %3s' % (planet[n].res_prod, planet[n].res, planet[n].ap, planet[n].pop)
+        pr_kn_wo_ind = '%3s %3s %3s' % (planet[n].ind, planet[n].ind_prod, planet[n].ships)
+        if planet[n].owner == dw_player or local_fleet(armada, worlds, dw_player, n, nof):
+            print(n, "  ", planet[n].owner, " ",pl_loc_line, pr_kn_wo_prd, pr_kn_wo_ind)
+        else:
+            print(n, "  ", planet[n].owner, " ",pl_loc_line)
+# also you can see a world if is in the same location as one of your worlds
 
 #events
 event = [1]
@@ -145,7 +160,7 @@ while end_game != "yes":
     if pl != t_player:
         t_player = pl
     else:
-        least_turns = turns[1]
+        least_turns = current_turn + 1
         least_pl = 1
         for n in range (1, nop+1):
             if turns[n] < least_turns:
@@ -156,10 +171,28 @@ while end_game != "yes":
     ch = 0
     while ch != 1 and ch != 2:
         print("Player", player[t_player], "take your turn.")
-        #print{"1.  End Game")
-        #print("2.  Take your turn")
-        ch = input("Enter a number")
-    
+        print("1.  End Game")
+        print("2.  Take your turn")
+        ch = int(input("Enter a number"))
+        print(ch)
+    if ch == 1:
+        end_game = 'yes'
+    else:
+        ch2 = 0
+        while ch2 != 1:
+            print("1.  End Turn")
+            print("2.  Display worlds")
+            print("3.  Display Fleets")
+            print("4.  Build on worlds")
+            print("5.  Send fleets")
+            print("6.  Attack")
+            print("7.  Distances to worlds")
+            ch2 = int(input("Enter a number"))
+            if ch2 == 2:
+                display_wrld(armada, worlds, nop*wpp, player[t_player], nof)
+            #other choices call functions
+        #check event table, process events
+        
         
 
 
