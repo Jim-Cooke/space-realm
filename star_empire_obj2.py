@@ -88,8 +88,8 @@ fleet[0].ships = 0
 fleet[0].cargo = 0
 fleet[0].crg_type = "_"
 
-#display fleets function
-def display_flt(armada, nof):
+#display fleets function - display fleet if you own it, it is at one of your planets, or at one of your fleets
+def display_flt(armada, worlds, nof, num, player[t_player]):
     print(" ")
     print("Flt Ownr     X    Y    Z   Sh  Cargo")
     for n in range (0, nof):
@@ -97,7 +97,7 @@ def display_flt(armada, nof):
         print(n, " ", fleet[n].owner, " ", ft_loc_line, " ", fleet[n].ships, " ", fleet[n].cargo, " ", fleet[n].crg_type)
 
 #call display fleets function
-display_flt(armada, nof)
+display_flt(armada, worlds, nof, nop*wpp, player[t_player])
 
 #local fleets function
 #returns true if player has fleet in location of planet n
@@ -107,8 +107,17 @@ def local_fleet(armada, worlds, lf_player, n, nof):
         if fleet[fl].owner == lf_player:
             if planet[n].locx == fleet[fl].locx and planet[n].locy == fleet[fl].locy and planet[n].locz == fleet[fl].locz:
                 return True
-        fl=fl+1    
+        fl=fl+1
 
+#local planets function
+#returns true if current player has a planet in same location as planet n
+def local_planet(worlds, num, lp_player, n)
+    for p in range (1, num+1):
+        if planet[p].owner = lp_player:
+            if planet[n].locx == planet[p].locx and planet[n].locy == planet[p].locy and planet[n].locz == planet[p].locz:
+                return True
+
+            
 #display worlds function
 def display_wrld(armada, worlds, num, dw_player, nof):
     print(" ")
@@ -119,11 +128,11 @@ def display_wrld(armada, worlds, num, dw_player, nof):
         #" ", planet[n].pop, " ", planet[n].ind, " ", planet[n].ind_prod, " ", planet[n].ships)
         pr_kn_wo_prd = '%3s %3s %3s %3s' % (planet[n].res_prod, planet[n].res, planet[n].ap, planet[n].pop)
         pr_kn_wo_ind = '%3s %3s %3s' % (planet[n].ind, planet[n].ind_prod, planet[n].ships)
-        if planet[n].owner == dw_player or local_fleet(armada, worlds, dw_player, n, nof):
+        if planet[n].owner == dw_player or local_fleet(armada, worlds, dw_player, n, nof) or local_planet(worlds, num, dw_player, n):
             print(n, "  ", planet[n].owner, " ",pl_loc_line, pr_kn_wo_prd, pr_kn_wo_ind)
         else:
             print(n, "  ", planet[n].owner, " ",pl_loc_line)
-# also you can see a world if is in the same location as one of your worlds
+# also you can see a world if is in the same location as one of your worlds or fleets
 
 #events
 event = [1]
@@ -190,8 +199,12 @@ while end_game != "yes":
             ch2 = int(input("Enter a number"))
             if ch2 == 2:
                 display_wrld(armada, worlds, nop*wpp, player[t_player], nof)
+            if ch2 == 3:
+                display_flt(armada, worlds, nof, nop*wpp, player[t_player])
+                #modify display fleets function so it displays enemy fleets near your planets, fleets
             #other choices call functions
         #check event table, process events
+        #still doing display worlds function        
         
         
 
