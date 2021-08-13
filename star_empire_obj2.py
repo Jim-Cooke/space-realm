@@ -88,18 +88,11 @@ fleet[0].ships = 0
 fleet[0].cargo = 0
 fleet[0].crg_type = "_"
 
-#display fleets function - display fleet if you own it, it is at one of your planets, or at one of your fleets
-def display_flt(armada, worlds, nof, num, player[t_player]):
-    print(" ")
-    print("Flt Ownr     X    Y    Z   Sh  Cargo")
-    for n in range (0, nof):
-        ft_loc_line = '%4s %4s %4s' % (fleet[n].locx, fleet[n].locy, fleet[n].locz)
-        print(n, " ", fleet[n].owner, " ", ft_loc_line, " ", fleet[n].ships, " ", fleet[n].cargo, " ", fleet[n].crg_type)
 
 #call display fleets function
 display_flt(armada, worlds, nof, nop*wpp, player[t_player])
 
-#local fleets function
+#local fleets function - rewrite to use a x y z location
 #returns true if player has fleet in location of planet n
 def local_fleet(armada, worlds, lf_player, n, nof):
     fl = 0
@@ -109,13 +102,22 @@ def local_fleet(armada, worlds, lf_player, n, nof):
                 return True
         fl=fl+1
 
-#local planets function
+#local planets function - rewrite to use an x y z location
 #returns true if current player has a planet in same location as planet n
 def local_planet(worlds, num, lp_player, n)
     for p in range (1, num+1):
         if planet[p].owner = lp_player:
             if planet[n].locx == planet[p].locx and planet[n].locy == planet[p].locy and planet[n].locz == planet[p].locz:
                 return True
+
+#display fleets function - display fleet if you own it, it is at one of your planets, or at one of your fleets
+def display_flt(armada, worlds, nof, num, df_player):
+    print(" ")
+    print("Flt Ownr     X    Y    Z   Sh  Cargo")
+    for n in range (0, nof):
+        ft_loc_line = '%4s %4s %4s' % (fleet[n].locx, fleet[n].locy, fleet[n].locz)
+        if df_player == fleet[n].owner:  #add loc_fleet and loc_world function call
+            print(n, " ", fleet[n].owner, " ", ft_loc_line, " ", fleet[n].ships, " ", fleet[n].cargo, " ", fleet[n].crg_type)
 
             
 #display worlds function
@@ -202,6 +204,8 @@ while end_game != "yes":
             if ch2 == 3:
                 display_flt(armada, worlds, nof, nop*wpp, player[t_player])
                 #modify display fleets function so it displays enemy fleets near your planets, fleets
+                #write functions to see if a player has fleets at loc x y z
+                #and function to see if a player has planets  at loc x y z - replace local planet and local fleet function
             #other choices call functions
         #check event table, process events
         #still doing display worlds function        
