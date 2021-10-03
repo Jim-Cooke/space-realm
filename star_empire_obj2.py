@@ -6,7 +6,7 @@ import time
 import math
 
 player = ["XXX"]
-turns = [0]
+pturns = [0]
 current_turn = 1
 t_player = 0
 
@@ -32,7 +32,7 @@ for n in range(1, nop + 1):
     print("Three-letter name of player ", n, "?")
     # name = input()
     player.append(input())
-    turns.append(0)
+    pturns = pturns + [0]
     # print(player[n])
     
 #  find size of cube containing worlds 
@@ -89,25 +89,23 @@ fleet[0].cargo = 0
 fleet[0].crg_type = "_"
 
 
-#call display fleets function
-display_flt(armada, worlds, nof, nop*wpp, player[t_player])
 
-#local fleets function - rewrite to use a x y z location
-#returns true if player has fleet in location of planet n
-def local_fleet(armada, worlds, lf_player, n, nof):
+#local fleets function - 
+#returns true if player has fleet in location x y z
+def local_fleet(armada, lf_player, nof, x, y, z):
     fl = 0
     while fl < nof:
         if fleet[fl].owner == lf_player:
-            if planet[n].locx == fleet[fl].locx and planet[n].locy == fleet[fl].locy and planet[n].locz == fleet[fl].locz:
+            if x == fleet[fl].locx and y == fleet[fl].locy and z == fleet[fl].locz:
                 return True
         fl=fl+1
 
-#local planets function - rewrite to use an x y z location
-#returns true if current player has a planet in same location as planet n
-def local_planet(worlds, num, lp_player, n)
-    for p in range (1, num+1):
-        if planet[p].owner = lp_player:
-            if planet[n].locx == planet[p].locx and planet[n].locy == planet[p].locy and planet[n].locz == planet[p].locz:
+#local planets function - 
+#returns true if current player has a planet in same location x y z
+def local_planet(worlds, n_of_w, lp_player, x, y, z):
+    for p in range (1, n_of_w+1):
+        if planet[p].owner == lp_player:
+            if x == planet[p].locx and y == planet[p].locy and z == planet[p].locz:
                 return True
 
 #display fleets function - display fleet if you own it, it is at one of your planets, or at one of your fleets
@@ -116,7 +114,8 @@ def display_flt(armada, worlds, nof, num, df_player):
     print("Flt Ownr     X    Y    Z   Sh  Cargo")
     for n in range (0, nof):
         ft_loc_line = '%4s %4s %4s' % (fleet[n].locx, fleet[n].locy, fleet[n].locz)
-        if df_player == fleet[n].owner:  #add loc_fleet and loc_world function call
+        if df_player == fleet[n].owner or local_fleet(armada, df_player, nof, fleet[n].locx, fleet[n].locy, fleet[n].locz) or \
+        local_planet(worlds, num, df_player, fleet[n].locx, fleet[n].locy, fleet[n].locz): 
             print(n, " ", fleet[n].owner, " ", ft_loc_line, " ", fleet[n].ships, " ", fleet[n].cargo, " ", fleet[n].crg_type)
 
             
@@ -125,12 +124,16 @@ def display_wrld(armada, worlds, num, dw_player, nof):
     print(" ")
     print("Wld  Ownr     X    Y    Z   Rp  Res A+P Pop Ind IP Sh")
     for n in range (1, num+1):
+        #
+        #print (n)
+        #
         pl_loc_line = '%4s %4s %4s' % (planet[n].locx, planet[n].locy, planet[n].locz)
         #print(n, "  ", planet[n].owner, " ",pl_loc_line, " ", planet[n].res_prod, " ", planet[n].res, " ", planet[n].ap,\
         #" ", planet[n].pop, " ", planet[n].ind, " ", planet[n].ind_prod, " ", planet[n].ships)
         pr_kn_wo_prd = '%3s %3s %3s %3s' % (planet[n].res_prod, planet[n].res, planet[n].ap, planet[n].pop)
         pr_kn_wo_ind = '%3s %3s %3s' % (planet[n].ind, planet[n].ind_prod, planet[n].ships)
-        if planet[n].owner == dw_player or local_fleet(armada, worlds, dw_player, n, nof) or local_planet(worlds, num, dw_player, n):
+        if planet[n].owner == dw_player or local_fleet(armada, dw_player, nof, planet[n].locx, planet[n].locy, planet[n].locz) or \
+        local_planet(worlds, num, dw_player, planet[n].locx, planet[n].locy, planet[n].locz):
             print(n, "  ", planet[n].owner, " ",pl_loc_line, pr_kn_wo_prd, pr_kn_wo_ind)
         else:
             print(n, "  ", planet[n].owner, " ",pl_loc_line)
@@ -174,8 +177,8 @@ while end_game != "yes":
         least_turns = current_turn + 1
         least_pl = 1
         for n in range (1, nop+1):
-            if turns[n] < least_turns:
-                least_turns = turns[n]
+            if pturns[n] < least_turns:
+                least_turns = pturns[n]
                 least_pl = n
         t_player = least_pl
     # menu
@@ -199,6 +202,8 @@ while end_game != "yes":
             print("6.  Attack")
             print("7.  Distances to worlds")
             ch2 = int(input("Enter a number"))
+            if ch2 == 1:
+                pturns[t_player] = pturns[t_player] + 1
             if ch2 == 2:
                 display_wrld(armada, worlds, nop*wpp, player[t_player], nof)
             if ch2 == 3:
@@ -206,6 +211,7 @@ while end_game != "yes":
                 #modify display fleets function so it displays enemy fleets near your planets, fleets
                 #write functions to see if a player has fleets at loc x y z
                 #and function to see if a player has planets  at loc x y z - replace local planet and local fleet function
+                # sep 2 - local planet and local fleet functions fixed, need to change how they are called
             #other choices call functions
         #check event table, process events
         #still doing display worlds function        
