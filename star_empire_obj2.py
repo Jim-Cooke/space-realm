@@ -6,7 +6,7 @@ import time
 import math
 
 player = ["XXX"]
-pturns = [0]
+turns = [0]
 current_turn = 1
 t_player = 0
 
@@ -32,7 +32,7 @@ for n in range(1, nop + 1):
     print("Three-letter name of player ", n, "?")
     # name = input()
     player.append(input())
-    pturns = pturns + [0]
+    turns.append(0)
     # print(player[n])
     
 #  find size of cube containing worlds 
@@ -139,6 +139,31 @@ def display_wrld(armada, worlds, num, dw_player, nof):
             print(n, "  ", planet[n].owner, " ",pl_loc_line)
 # also you can see a world if is in the same location as one of your worlds or fleets
 
+#build on worlds function
+def build(worlds, num, player):
+    p = int(input("Which world?"))
+    if planet[p].owner == player:
+        #  build things
+        print("What to build?")
+        print("1.  Ships")
+        print("2.  Industries")
+        print("3.  Animals + Plants")
+        th = input()
+        n = int(input("How many?"))
+        if n > planet[p].ind_prod:
+            print("Not enough industrial production.")
+        else:
+            planet[p].ind_prod = planet[p].ind_prod - n
+            print("choice=", th)
+            if th == '1':
+                planet[p].ships = planet[p].ships + n
+            if th == '2':
+                planet[p].ind = planet[p].ind + n
+            if th == '3':
+                planet[p].ap = planet[p].ap + n
+    else:
+        print("You don't own that planet.")
+
 #events
 event = [1]
 for n in range (1, nop*wpp+1):
@@ -177,8 +202,8 @@ while end_game != "yes":
         least_turns = current_turn + 1
         least_pl = 1
         for n in range (1, nop+1):
-            if pturns[n] < least_turns:
-                least_turns = pturns[n]
+            if turns[n] < least_turns:
+                least_turns = turns[n]
                 least_pl = n
         t_player = least_pl
     # menu
@@ -202,8 +227,6 @@ while end_game != "yes":
             print("6.  Attack")
             print("7.  Distances to worlds")
             ch2 = int(input("Enter a number"))
-            if ch2 == 1:
-                pturns[t_player] = pturns[t_player] + 1
             if ch2 == 2:
                 display_wrld(armada, worlds, nop*wpp, player[t_player], nof)
             if ch2 == 3:
@@ -212,6 +235,8 @@ while end_game != "yes":
                 #write functions to see if a player has fleets at loc x y z
                 #and function to see if a player has planets  at loc x y z - replace local planet and local fleet function
                 # sep 2 - local planet and local fleet functions fixed, need to change how they are called
+            if ch2 == 4:
+                build(worlds, nop*wpp, player[t_player])
             #other choices call functions
         #check event table, process events
         #still doing display worlds function        
