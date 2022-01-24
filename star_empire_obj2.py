@@ -87,7 +87,11 @@ fleet[0].dest_z = 0
 fleet[0].ships = 0
 fleet[0].cargo = 0
 fleet[0].crg_type = "_"
-
+#crg_type - ap, pop, ind
+fleet[0].status = "null"
+# status - null, inflight, still
+fleet[0].arr = 0
+# arr - arrival time
 
 
 #local fleets function - 
@@ -148,22 +152,116 @@ def build(worlds, num, player):
         print("1.  Ships")
         print("2.  Industries")
         print("3.  Animals + Plants")
-        th = input()
+        th = int(input())
         n = int(input("How many?"))
         if n > planet[p].ind_prod:
             print("Not enough industrial production.")
         else:
             planet[p].ind_prod = planet[p].ind_prod - n
+            planet[p].res = planet[p].res - n
             print("choice=", th)
-            if th == '1':
+            if th == 1:
                 planet[p].ships = planet[p].ships + n
-            if th == '2':
+            if th == 2:
                 planet[p].ind = planet[p].ind + n
-            if th == '3':
+            if th == 3:
                 planet[p].ap = planet[p].ap + n
     else:
         print("You don't own that planet.")
 
+#send_fleet function
+def send_fleet(worlds, planets, player, armada, nof)
+    # fl is fleet number and d_pl is destination planet s_pl start planet
+    # send existing fleet or create new one?
+    ch = "x"
+    while ch != "e" and ch != "n":
+        ch = input("Enter e for existing fleet or n for new fleet")
+    # find or create fleet table entry
+    if ch == "n":  #new fleet
+        fl = 0
+        while fl =< nof:
+            if fl == nof:
+                # all fleet entries were used
+                fleet.append[fl]
+                nof = nof + 1
+                break
+            if fleet[fl].status == "null":
+                break
+            fl = fl +1
+        # create fleet
+        fleet[fl].owner = player
+        s_pl = int(input("what planet to start from?"))
+        while planet[s_pl] != player:
+            s_pl = int(input("what planet to start from?"))
+        # ships
+        fleet[fl].ships = 0
+        while fleet[fl].ships > 0 and fleet[fl].ships <= planet[s_pl].ships
+            fleet[fl].ships = int(input("How many ships?")
+        planet[s_pl].ships = planet[s_pl].ships -fleet[fl].ships
+        cargo_ok = "no"
+        while cargo_ok == "no":
+            #cargo amt
+            fleet[fl].cargo = int(input("Amount of cargo?"))
+            if fleet[fl].cargo == 0:
+                break
+            if fleet[fl].cargo < 0:
+                cargo_ok = "no"
+                continue
+            # cargo type
+            fleet[fl].crg_type = "_"
+            while fleet[fl].crg_type != "ap" and fleet[fl].crg_type != "pop" and fleet[fl].crg_type != "ind":
+                fleet[fl].crg_type = input("Enter cargo type: ap, pop, ind")
+            if fleet[fl].crg_type == "ap":
+                if fleet[fl].cargo <= planet[s_pl].ap:
+                   planet[s_pl].ap =  planet[s_pl].ap - fleet[fl].cargo
+                   break
+                else:
+                    print("Not enough on the planet")
+                    cargo_ok = "no"
+                    continue              
+            if fleet[fl].crg_type == "pop":
+                if fleet[fl].cargo <= planet[s_pl].pop:
+                   planet[s_pl].pop =  planet[s_pl].pop - fleet[fl].cargo
+                   break
+                else:
+                    print("Not enough on the planet")
+                    cargo_ok = "no"
+                    continue                         
+            if fleet[fl].crg_type == "ind":                     
+                if fleet[fl].cargo <= planet[s_pl].ind:
+                   planet[s_pl].ind =  planet[s_pl].ind - fleet[fl].cargo
+                   break
+                else:
+                    print("Not enough on the planet")
+                    cargo_ok = "no"
+                    continue
+# continue building the fleet entry
+                                  
+    if ch == "e":   #existing fleet
+        # make sure fleet exists and is owned by player
+        fleet_ok = "no"
+        while fleet_ok != "yes":
+            fl = int(input("What fleet to use?"))
+            fleet_ok = "yes"
+            if fl >= nof or fl < 0:
+                fleet_ok = "no"
+            if fleet[fl].owner != player:
+                fleet_ok = "no"
+    # planet or location?
+    dest = "x"
+    while dest != "p" and dest != "l":
+        dest = input("Is destination a planet or a location? p or l")
+    if dest == "p":
+        #create entry for planet
+        d_pl = -1
+        while d_pl < 1 or d_pl > nop*wpp:
+            d_pl = int(input("Enter destination planet"))
+        fleet[fl].dest_wrld = d_pl 
+    if dest == "l":
+    #create entry for location
+        fleet[fl].dest_x = int(input("Enter destination x co-ordinate"))
+        fleet[fl].dest_y = int(input("Enter destination y co-ordinate"))
+        fleet[fl].dest_z = int(input("Enter destination z co-ordinate"))     
 #events
 event = [1]
 for n in range (1, nop*wpp+1):
@@ -231,17 +329,16 @@ while end_game != "yes":
                 display_wrld(armada, worlds, nop*wpp, player[t_player], nof)
             if ch2 == 3:
                 display_flt(armada, worlds, nof, nop*wpp, player[t_player])
-                #modify display fleets function so it displays enemy fleets near your planets, fleets
-                #write functions to see if a player has fleets at loc x y z
-                #and function to see if a player has planets  at loc x y z - replace local planet and local fleet function
-                # sep 2 - local planet and local fleet functions fixed, need to change how they are called
             if ch2 == 4:
                 build(worlds, nop*wpp, player[t_player])
+            if ch2 == 5:
+                send_fleet(worlds, nop*wpp, player[t_player], armada, nof)
             #other choices call functions
         #check event table, process events
-        #still doing display worlds function        
+        #still doing send fleets - building the new fleet entry        
         
         
+
 
 
 
