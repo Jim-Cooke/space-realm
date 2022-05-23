@@ -26,6 +26,7 @@ def random_1():
 nop = int(input("How many players?"))
 #  print(nop)
 wpp = int(input("How many worlds per player?"))
+no_worlds = nop*wpp
 
 # enter player names
 for n in range(1, nop + 1):
@@ -40,11 +41,11 @@ cube_side = (nop*wpp*27)**(1./3.)
 
 
 planet = [1]
-for n in range (1, nop*wpp+1):
+for n in range (1, no_worlds+1):
     planet.append(n)
 
 class worlds :pass
-for n in range (1, nop*wpp+1):
+for n in range (1, no_worlds+1):
     planet[n] = worlds()
     if n <= nop:
         planet[n].owner = player[n]
@@ -90,7 +91,7 @@ fleet[0].crg_type = "_"
 #crg_type - ap, pop, ind
 fleet[0].status = "null"
 # status - null, inflight, still
-fleet[0].arr = 0
+# fleet[0].arr = 0
 # arr - arrival time
 
 
@@ -169,8 +170,27 @@ def build(worlds, num, player):
     else:
         print("You don't own that planet.")
 
+#events
+event = [1]
+for n in range (1, no_worlds+1):
+    event.append(n)
+#number of events
+noe = nop*wpp
+
+#events - planet production "prod", fleet arrives "arr"
+#time = -1 means unused event
+# planet or fleet number
+class turns :pass
+#seed event table with planet production events for each world
+for n in range (1, noe+1):
+    event[n] = turns()
+    event[n].time = 1 + 2*random_1()
+    event[n].type = "prod"
+    event[n].number = n
+
+
 #send_fleet function
-def send_fleet(worlds, planets, player, armada, nof)
+def send_fleet(worlds, planets, player, armada, nof, no_worlds):
     # fl is fleet number and d_pl is destination planet s_pl start planet
     # send existing fleet or create new one?
     ch = "x"
@@ -179,7 +199,7 @@ def send_fleet(worlds, planets, player, armada, nof)
     # find or create fleet table entry
     if ch == "n":  #new fleet
         fl = 0
-        while fl =< nof:
+        while fl <= nof:
             if fl == nof:
                 # all fleet entries were used
                 fleet.append[fl]
@@ -190,14 +210,17 @@ def send_fleet(worlds, planets, player, armada, nof)
             fl = fl +1
         # create fleet
         fleet[fl].owner = player
+        fleet[fl].status = "inflight"
         s_pl = int(input("what planet to start from?"))
-        while planet[s_pl] != player:
+        while planet[s_pl].owner != player:
             s_pl = int(input("what planet to start from?"))
         # ships
-        fleet[fl].ships = 0
-        while fleet[fl].ships > 0 and fleet[fl].ships <= planet[s_pl].ships
-            fleet[fl].ships = int(input("How many ships?")
-        planet[s_pl].ships = planet[s_pl].ships -fleet[fl].ships
+        while True:
+            fleet[fl].ships = int(input("How many ships?"))
+            if fleet[fl].ships > 0 and fleet[fl].ships <= planet[s_pl].ships:
+                break
+        planet[s_pl].ships = planet[s_pl].ships - fleet[fl].ships
+        #cargo
         cargo_ok = "no"
         while cargo_ok == "no":
             #cargo amt
@@ -235,8 +258,7 @@ def send_fleet(worlds, planets, player, armada, nof)
                     print("Not enough on the planet")
                     cargo_ok = "no"
                     continue
-# continue building the fleet entry
-                                  
+    # continue building the fleet entry
     if ch == "e":   #existing fleet
         # make sure fleet exists and is owned by player
         fleet_ok = "no"
@@ -254,32 +276,42 @@ def send_fleet(worlds, planets, player, armada, nof)
     if dest == "p":
         #create entry for planet
         d_pl = -1
-        while d_pl < 1 or d_pl > nop*wpp:
+        while d_pl < 1 or d_pl > no_worlds:
             d_pl = int(input("Enter destination planet"))
         fleet[fl].dest_wrld = d_pl 
     if dest == "l":
     #create entry for location
         fleet[fl].dest_x = int(input("Enter destination x co-ordinate"))
         fleet[fl].dest_y = int(input("Enter destination y co-ordinate"))
-        fleet[fl].dest_z = int(input("Enter destination z co-ordinate"))     
-#events
-event = [1]
-for n in range (1, nop*wpp+1):
-    event.append(n)
-
-#number of events
-noe = nop*wpp
-
-#events - planet production "prod", fleet arrives "arr"
-#time = -1 means unused event
-# planet or fleet number
-class turns :pass
-#seed event table with planet production events
-for n in range (1, noe+1):
-    event[n] = turns()
-    event[n].time = 1 + 2*random_1()
-    event[n].type = "prod"
-    event[n].number = n
+        fleet[fl].dest_z = int(input("Enter destination z co-ordinate"))
+    # find arrival time
+    # find current location
+    # if new fleet
+    if ch == "n":
+        c_locx = planet[s_pl].locx
+        c_locy = planet[s_pl].locy
+        c_locz = planet[s_pl].locz
+    # if existing fleet
+    if ch == "e":
+        c_locx = fleet[fl].locx
+        c_locy = fleet[fl].locy
+        c_locz = fleet[fl].locz
+    # find destination location
+    # if dest is planet
+    if dest == "p":
+        d_locx = planet[d_pl].locx
+        d_locy = planet[d_pl].locy
+        d_locz = planet[d_pl].locz
+    # if dest is location
+    if dest == "l":
+        d_locx = fleet[fl].dest_x
+        d_locy = fleet[fl].dest_y
+        d_locz = fleet[fl].dest_z
+    # calculate arrival time
+    dist = math.sqrt((c_locx - d_locx)**2 + (c_locy - d_locy)**2 + (c_locz - d_locz)**2)
+    arr_t = 2*math.sqrt(dist)
+    # put arrival in event table
+    # find empty event record, or create new one, enter fleet arrival time
     
 #structure of game
 #choose player, player takes turn
@@ -332,10 +364,10 @@ while end_game != "yes":
             if ch2 == 4:
                 build(worlds, nop*wpp, player[t_player])
             if ch2 == 5:
-                send_fleet(worlds, nop*wpp, player[t_player], armada, nof)
+                send_fleet(worlds, nop*wpp, player[t_player], armada, nof, no_worlds)
             #other choices call functions
         #check event table, process events
-        #still doing send fleets - building the new fleet entry        
+        #still doing send fleets - about to put new fleet arrival into event table     
         
         
 
