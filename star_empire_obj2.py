@@ -170,10 +170,24 @@ def build(worlds, num, player):
         print("You don't own that planet")
 
         
-def travel_time(orig_x, orig_y, orig_z, dest_x, dest_y, dest_z)
+def travel_time(orig_x, orig_y, orig_z, dest_x, dest_y, dest_z):
     dist = math.sqrt((orig_x-dest_x)**2 + (orig_y-dest_y)**2 + (orig_z-dest_z)**2)
     return 2 * math.sqrt(dist)
 
+def which_fleet(guy, armada, nof):
+#must own fleet and it must be at rest
+    fleet_ok = "no"    
+    while fleet_ok != "yes":
+        fl = int(input("What fleet to use? Enter -1 to not select any fleet"))
+        fleet_ok = "yes"
+        if fl >= nof or fl < 0:
+            fleet_ok = "no"
+        if fl == -1:
+            return
+        if fleet[fl].owner != guy or fleet[fl].status != "still":
+            fleet_ok = "no"
+            print("That fleet is not available")
+    return fl
 
 #send_fleet function
 def send_fleet(worlds, planets, guy, armada, nof, current_turn):
@@ -184,20 +198,12 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
         ch = input("Enter e for existing fleet or n for new fleet")
     #existing fleet
     if ch == "e":   
-    # make sure fleet exists and is owned by player
-    # which fleet?
-    if own_fl == "yes":
-        fleet_ok = "no"    
-        while fleet_ok != "yes":
-            fl = int(input("What fleet to use? Enter -1 to not select any fleet"))
-            fleet_ok = "yes"
-            if fl >= nof or fl < 0:
-                fleet_ok = "no"
-            if fl == -1:
-                return
-            if fleet[fl].owner != guy:
-                fleet_ok = "no"
-    # if fleet not selected drop out of function
+        # make sure fleet exists and is owned by player and is still
+        # which fleet?
+        fl = which_fleet(guy, armada, nof)
+        # if fleet not selected drop out of function
+        if fl == -1:
+            return
     #new fleet
     # find or create fleet table entry
     if ch == "n":  
@@ -218,7 +224,7 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
             s_pl = int(input("what planet to start from? Enter -1 to not select a planet"))
             if s_pl == -1:
                 return
-    #if planet not selected drop out of function
+        #if planet not selected drop out of function
         #fleet location is location of starting planet
         fleet[fl].locx = planet[s_pl].locx
         fleet[fl].locy = planet[s_pl].locy
@@ -233,47 +239,46 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
             planet[a_pl].owner = "XXX"
             print("You no longer own planet ", a_pl)
         #cargo
-        cargo_ok = "no"
-        while cargo_ok == "no":
+        #whether to carry cargo or not
+        fleet[fl].crg_type = "_"
+        fleet[fl].cargo = 0
+        cargo_yn = "x"
+        while cargo_yn != "y" and cargo_yn != "n":
+            cargo_yn = int(input("Will there be cargo? Enter y or n")
+        # find cargo type and amount
+        while cargo_yn == "y":
             # cargo type
-            fleet[fl].crg_type = "_"
             while fleet[fl].crg_type != "ap" and fleet[fl].crg_type != "pop" and fleet[fl].crg_type != "ind":
                 fleet[fl].crg_type = input("Enter cargo type: ap, pop, ind")
             #cargo amt
             fleet[fl].cargo = int(input("Amount of cargo?"))
             if fleet[fl].cargo == 0:
+                fleet[fl].crg_type = "_"
                 break
             if fleet[fl].cargo < 0:
-                cargo_ok = "no"
                 print("Incorrect amount")
                 continue
             # enough?                
             if fleet[fl].crg_type == "ap":
                 if fleet[fl].cargo <= planet[s_pl].ap:
-                   planet[s_pl].ap =  planet[s_pl].ap - fleet[fl].cargo
-                   cargo_ok = "yes"
-                   break
+                    planet[s_pl].ap =  planet[s_pl].ap - fleet[fl].cargo
+                    break
                 else:
                     print("Not enough on the planet")
-                    cargo_ok = "no"
                     continue              
             if fleet[fl].crg_type == "pop":
                 if fleet[fl].cargo <= planet[s_pl].pop:
-                   planet[s_pl].pop =  planet[s_pl].pop - fleet[fl].cargo
-                   cargo_ok = "yes"
-                   break
+                    planet[s_pl].pop =  planet[s_pl].pop - fleet[fl].cargo
+                    break
                 else:
                     print("Not enough on the planet")
-                    cargo_ok = "no"
                     continue                         
             if fleet[fl].crg_type == "ind":                     
                 if fleet[fl].cargo <= planet[s_pl].ind:
-                   planet[s_pl].ind =  planet[s_pl].ind - fleet[fl].cargo
-                   cargo_ok = "yes"
-                   break
+                    planet[s_pl].ind =  planet[s_pl].ind - fleet[fl].cargo
+                    break
                 else:
                     print("Not enough on the planet")
-                    cargo_ok = "no"
                     continue
     #destination
     # planet or location?
@@ -297,7 +302,80 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
     #calculate arrival time
     tt = travel_time(fleet[fl].locx, fleet[fl].locy, fleet[fl].locz, fleet[fl].dest_x, fleet[fl].dest_y, fleet[fl].dest_z)
     fleet[fl].arr = current_turn + tt
+    # fleet status
+    fleet[fl].status = "inflight"
 
+
+#battle function
+def battle(firing, hiding, limit)
+    n = 1
+    h = hiding                       
+    while n <= firing and n <= limit and h > 0:
+        n = n + 1
+        if random_1() > 0.5:
+            h = h - 1  
+    return h
+
+#combat function
+def combat(atts, defs):
+# if attackers win returns number of surviving attackers
+# if defenders win returns negative value of surviving defenders
+    limit = 1
+    while True:
+        # defenders fire
+        atts = battle(defs, atts, limit)        
+        if atts <= 0:
+            break                   
+        limit = limit * 2                        
+        # attackers fire
+        defs = battle(atts, defs, limit)
+        if defs <= 0:
+            break
+        limit = limit * 2
+    if defs <= 0:
+        return atts
+    if atts <= 0:
+        return (-1) * defs
+
+#attack function
+def attack(guy, armada, nof):
+    #which fleet
+    a_fl = which_fleet(guy, armada, nof)
+    # if fleet not selected drop out of function
+    if a_fl == -1:
+        return
+    print("If you wish to attack a planet, send your fleet to it")
+    # find if there is a fleet in the same location as your fleet
+    print("Fleets you may attack:")
+    n_fleets = 0
+    for n in range (0, nof):
+        if fleet[n].locx == fleet[a_fl].locx and fleet[n].locy == fleet[a_fl].locy and fleet[n].locz == fleet[a_fl].locz and \
+        fleet[n].status == "still" and fleet[n].owner != guy:
+            print("fleet ", n, " ", fleet[n].ships, " ships"
+            n_fleets = n_fleets + 1
+    if n_fleets == 0:
+        print("There are no fleets to attack")
+        return
+    else:
+        # there are valid fleets, choose one
+        fleet_ok = "no"    
+        while fleet_ok != "yes":
+            fl = int(input("What fleet to attack? Enter -1 to not attack"))
+            if fl >= nof or fl < 0:
+                fleet_ok = "no"
+            if fl == -1:
+                return
+            if fleet[d_fl].locx == fleet[a_fl].locx and fleet[d_fl].locy == fleet[a_fl].locy and fleet[d_fl].locz == fleet[a_fl].locz and \
+            fleet[d_fl].status == "still" and fleet[d_fl].owner != guy:
+                fleet_ok = "yes"
+            if fleet_ok = "no":
+                print("That fleet is not available")
+        # call combat function
+        c_outcome = combat(fleet[a_fl].ships, fleet[d_fl].ships
+
+
+
+                          
 #events
 event = [1]
 for n in range (1, nop*wpp+1):
@@ -358,7 +436,7 @@ while end_game != "yes":
             print("3.  Display Fleets")
             print("4.  Build on worlds")
             print("5.  Send fleets")
-            print("6.  Attack")
+            print("6.  Attack Fleet")
             print("7.  Distances to worlds")
             ch2 = int(input("Enter a number"))
             if ch2 == 2:
@@ -369,9 +447,11 @@ while end_game != "yes":
                 build(worlds, nop*wpp, player[t_player])
             if ch2 == 5:
                 send_fleet(worlds, nop*wpp, player[t_player], armada, nof, current_turn)
+            if ch2 == 6:
+                attack(player[t_tplayer], armada, nof)
             #other choices call functions
         #check event table, process events
-        #still doing send fleets - building the new fleet entry        
+        #working on attack - rewrite combat function as two calls to a function handling the firing  
         
         
 
