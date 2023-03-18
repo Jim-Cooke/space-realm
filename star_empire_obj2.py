@@ -305,16 +305,18 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
     # fleet status
     fleet[fl].status = "inflight"
 
-
-#battle function
-def battle(firing, hiding, limit)
+#firing function
+def firing(firer, target, limit):
+    # firer shoots up to their number or limit or until target forces eliminated
     n = 1
-    h = hiding                       
-    while n <= firing and n <= limit and h > 0:
-        n = n + 1
+    while n <= firer and n <= limit:
         if random_1() > 0.5:
-            h = h - 1  
-    return h
+            target = target - 1
+        if target <= 0:
+            break
+        n = n + 1
+    return target
+                       
 
 #combat function
 def combat(atts, defs):
@@ -323,19 +325,16 @@ def combat(atts, defs):
     limit = 1
     while True:
         # defenders fire
-        atts = battle(defs, atts, limit)        
+        atts = firing(defs, atts, limit)
         if atts <= 0:
-            break                   
-        limit = limit * 2                        
-        # attackers fire
-        defs = battle(atts, defs, limit)
-        if defs <= 0:
-            break
+            return (-1) * defs
         limit = limit * 2
-    if defs <= 0:
-        return atts
-    if atts <= 0:
-        return (-1) * defs
+        # attackers fire
+        defs = firing(atts, defs, limit)
+        if defs <= 0:
+            return atts
+        limit = limit * 2
+    
 
 #attack function
 def attack(guy, armada, nof):
@@ -371,7 +370,7 @@ def attack(guy, armada, nof):
             if fleet_ok = "no":
                 print("That fleet is not available")
         # call combat function
-        c_outcome = combat(fleet[a_fl].ships, fleet[d_fl].ships
+        c_outcome = combat(fleet[a_fl].ships, fleet[d_fl].ships)
 
 
 
@@ -451,9 +450,7 @@ while end_game != "yes":
                 attack(player[t_tplayer], armada, nof)
             #other choices call functions
         #check event table, process events
-        #working on attack - rewrite combat function as two calls to a function handling the firing  
-        
-        
+        #working on attack - next do result of combat function        
 
 
 
