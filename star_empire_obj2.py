@@ -159,7 +159,7 @@ def build(worlds, num, player):
         else:
             planet[p].ind_prod = planet[p].ind_prod - n
             planet[p].res = planet[p].res - n
-            print("choice=", th)
+            # print("choice=", th)
             if th == 1:
                 planet[p].ships = planet[p].ships + n
             if th == 2:
@@ -210,7 +210,7 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
         fl = 0
         while fl <= nof:
             if fl == nof:
-                # all fleet entries were used
+            # all fleet entries were used
                 fleet.append[fl]
                 nof = nof + 1
                 break
@@ -235,8 +235,8 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
             if fleet[fl].ships > 0 and fleet[fl].ships <= planet[s_pl].ships:
                 break
         planet[s_pl].ships = planet[s_pl].ships - fleet[fl].ships
-        if planet[a_pl].ships == 0:
-            planet[a_pl].owner = "XXX"
+        if planet[s_pl].ships == 0:
+            planet[s_pl].owner = "XXX"
             print("You no longer own planet ", a_pl)
         #cargo
         #whether to carry cargo or not
@@ -244,7 +244,7 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
         fleet[fl].cargo = 0
         cargo_yn = "x"
         while cargo_yn != "y" and cargo_yn != "n":
-            cargo_yn = int(input("Will there be cargo? Enter y or n")
+            cargo_yn = input("Will there be cargo? Enter y or n")
         # find cargo type and amount
         while cargo_yn == "y":
             # cargo type
@@ -350,7 +350,7 @@ def attack(guy, armada, nof):
     for n in range (0, nof):
         if fleet[n].locx == fleet[a_fl].locx and fleet[n].locy == fleet[a_fl].locy and fleet[n].locz == fleet[a_fl].locz and \
         fleet[n].status == "still" and fleet[n].owner != guy:
-            print("fleet ", n, " ", fleet[n].ships, " ships"
+            print("fleet ", n, " ", fleet[n].ships, " ships")
             n_fleets = n_fleets + 1
     if n_fleets == 0:
         print("There are no fleets to attack")
@@ -367,13 +367,23 @@ def attack(guy, armada, nof):
             if fleet[d_fl].locx == fleet[a_fl].locx and fleet[d_fl].locy == fleet[a_fl].locy and fleet[d_fl].locz == fleet[a_fl].locz and \
             fleet[d_fl].status == "still" and fleet[d_fl].owner != guy:
                 fleet_ok = "yes"
-            if fleet_ok = "no":
+            if fleet_ok == "no":
                 print("That fleet is not available")
         # call combat function
         c_outcome = combat(fleet[a_fl].ships, fleet[d_fl].ships)
+        if c_outcome > 0:
+            fleet[a_fl].ships = c_outcome
+            fleet[d_fl].status = "null"
+            print("The attacker won!")
+        if c_outcome < 0:
+            fleet[d_fl].ships = c_outcome * (-1)
+            fleet[a_fl].status = "mull"
+            print("The defender won!")           
 
-
-
+# distances function
+def distances(worlds, armada):
+    # finds distances between worlds, fleets, locations
+    
                           
 #events
 event = [1]
@@ -448,9 +458,11 @@ while end_game != "yes":
                 send_fleet(worlds, nop*wpp, player[t_player], armada, nof, current_turn)
             if ch2 == 6:
                 attack(player[t_tplayer], armada, nof)
+            if ch2 == 7:
+                distances(worlds, armada)
             #other choices call functions
         #check event table, process events
-        #working on attack - next do result of combat function        
+             
 
 
 
