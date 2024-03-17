@@ -169,10 +169,16 @@ def build(worlds, num, player):
     else:
         print("You don't own that planet")
 
+
+
+def distance(orig_x, orig_y, orig_z, dest_x, dest_y, dest_z):
+    return math.sqrt((orig_x-dest_x)**2 + (orig_y-dest_y)**2 + (orig_z-dest_z)**2)
+
         
 def travel_time(orig_x, orig_y, orig_z, dest_x, dest_y, dest_z):
-    dist = math.sqrt((orig_x-dest_x)**2 + (orig_y-dest_y)**2 + (orig_z-dest_z)**2)
+    dist = distance(orig_x, orig_y, orig_z, dest_x, dest_y, dest_z)
     return 2 * math.sqrt(dist)
+
 
 def which_fleet(guy, armada, nof):
 #must own fleet and it must be at rest
@@ -380,11 +386,68 @@ def attack(guy, armada, nof):
             fleet[a_fl].status = "mull"
             print("The defender won!")           
 
-# distances function
-def distances(worlds, armada):
+# locations function
+def locations(worlds, armada, pl):
     # finds distances between worlds, fleets, locations
-    
-                          
+    # starting location
+    loci = "x"
+    while loci != "w" and loci != "f" and loci != "l":
+        loci = input("Is the first location a world, fleet or location? Enter w, f or l")
+        # location of a world
+    if loci == "w":
+        wi = 0
+        while wi < 1 or wi > nop*wpp:
+            wi = input("Enter world number")
+        xi = planet[wi].locx
+        yi = planet[wi].locy
+        zi = planet[wi].locz
+        # location of a fleet
+    if loci == "f":
+        #print player's fleets
+        print("Your Fleets")
+        print("Number X Y Z")
+        fl_counter = 0
+        for i in range(0, nop*wpp+1):
+            if fleet[i].owner == pl and fleet[i].status == "still":
+                fl_counter = fl_counter + 1
+                print(i, fleet[i].locx, fleet[i].locy, fleet[i].locz)
+        if fl_counter == 0:
+            print("You have no fleets")
+            return
+        else:
+            fi = -1
+            while fi < 0 or fi > nof-1 or fleet[i].owner != pl or fleet[i].status != "still":
+                fi = input("Enter fleet number")
+            xi = fleet[fi].locx
+            yi = fleet[fi].locy
+            zi = fleet[fi].locz
+        # a location
+        if loci == 'l':
+            xi = input("Enter x co-ordinate of location")
+            yi = input("Enter y co-ordinate of location")
+            zi = input("Enter z co-ordinate of location")
+    # ending location
+    locii = 'x'
+    while locii != "w" and loci != "l":
+        locii = input("Is the end location a world or location? Enter w or l")
+    # location of a world
+    if locii == "w":
+        wi = 0
+        while wi < 1 or wi > nop*wpp:
+            wi = input("Enter world number")
+        xii = planet[wi].locx
+        yii = planet[wi].locy
+        zii = planet[wi].locz
+    # a location
+    if locii == 'l':
+        xii = input("Enter x co-ordinate of location")
+        yii = input("Enter y co-ordinate of location")
+        zii = input("Enter z co-ordinate of location")
+#  calculate travel time
+    return travel_time(xi, yi, zi, xii, yii, zii)
+
+        
+               
 #events
 event = [1]
 for n in range (1, nop*wpp+1):
@@ -446,7 +509,7 @@ while end_game != "yes":
             print("4.  Build on worlds")
             print("5.  Send fleets")
             print("6.  Attack Fleet")
-            print("7.  Distances to worlds")
+            print("7.  Travel time between locations")
             ch2 = int(input("Enter a number"))
             if ch2 == 2:
                 display_wrld(armada, worlds, nop*wpp, player[t_player], nof)
@@ -459,9 +522,10 @@ while end_game != "yes":
             if ch2 == 6:
                 attack(player[t_tplayer], armada, nof)
             if ch2 == 7:
-                distances(worlds, armada)
+                locations(worlds, armada, player[t_player])
             #other choices call functions
-        #check event table, process events
+        #still to check event table, process events
+        #test locations function
              
 
 
