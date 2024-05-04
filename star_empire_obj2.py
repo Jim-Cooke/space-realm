@@ -304,7 +304,8 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
     #create entry for location
         fleet[fl].dest_x = int(input("Enter destination x co-ordinate"))
         fleet[fl].dest_y = int(input("Enter destination y co-ordinate"))
-        fleet[fl].dest_z = int(input("Enter destination z co-ordinate"))     
+        fleet[fl].dest_z = int(input("Enter destination z co-ordinate"))
+        fleet[fl].dest_wrld = 0
     #calculate arrival time
     tt = travel_time(fleet[fl].locx, fleet[fl].locy, fleet[fl].locz, fleet[fl].dest_x, fleet[fl].dest_y, fleet[fl].dest_z)
     fleet[fl].arr = current_turn + tt
@@ -387,7 +388,7 @@ def attack(guy, armada, nof):
             print("The defender won!")           
 
 # locations function
-def locations(worlds, armada, pl):
+def locations(worlds, armada, pl, nof):
     # finds distances between worlds, fleets, locations
     # starting location
     loci = "x"
@@ -397,7 +398,7 @@ def locations(worlds, armada, pl):
     if loci == "w":
         wi = 0
         while wi < 1 or wi > nop*wpp:
-            wi = input("Enter world number")
+            wi = int(input("Enter world number"))
         xi = planet[wi].locx
         yi = planet[wi].locy
         zi = planet[wi].locz
@@ -407,7 +408,7 @@ def locations(worlds, armada, pl):
         print("Your Fleets")
         print("Number X Y Z")
         fl_counter = 0
-        for i in range(0, nop*wpp+1):
+        for i in range(0, nof):
             if fleet[i].owner == pl and fleet[i].status == "still":
                 fl_counter = fl_counter + 1
                 print(i, fleet[i].locx, fleet[i].locy, fleet[i].locz)
@@ -421,63 +422,92 @@ def locations(worlds, armada, pl):
             xi = fleet[fi].locx
             yi = fleet[fi].locy
             zi = fleet[fi].locz
-        # a location
-        if loci == 'l':
-            xi = input("Enter x co-ordinate of location")
-            yi = input("Enter y co-ordinate of location")
-            zi = input("Enter z co-ordinate of location")
+    # a location
+    if loci == 'l':
+        xi = int(input("Enter x co-ordinate of location"))
+        yi = int(input("Enter y co-ordinate of location"))
+        zi = int(input("Enter z co-ordinate of location"))
     # ending location
     locii = 'x'
-    while locii != "w" and loci != "l":
+    while locii != "w" and locii != "l":
         locii = input("Is the end location a world or location? Enter w or l")
     # location of a world
     if locii == "w":
         wi = 0
         while wi < 1 or wi > nop*wpp:
-            wi = input("Enter world number")
+            wi = int(input("Enter world number"))
         xii = planet[wi].locx
         yii = planet[wi].locy
         zii = planet[wi].locz
     # a location
     if locii == 'l':
-        xii = input("Enter x co-ordinate of location")
-        yii = input("Enter y co-ordinate of location")
-        zii = input("Enter z co-ordinate of location")
+        xii = int(input("Enter x co-ordinate of location"))
+        yii = int(input("Enter y co-ordinate of location"))
+        zii = int(input("Enter z co-ordinate of location"))
 #  calculate travel time
-    return travel_time(xi, yi, zi, xii, yii, zii)
+    tt = travel_time(xi, yi, zi, xii, yii, zii)
+    print("Travel time is ", tt, "turns.")
 
         
                
-#events
-event = [1]
-for n in range (1, nop*wpp+1):
-    event.append(n)
-
-#number of events
-noe = nop*wpp
-
-#events - planet production "prod", fleet arrives "arr"
-#time = -1 means unused event
-# planet or fleet number
-class turns :pass
-#seed event table with planet production events
-for n in range (1, noe+1):
-    event[n] = turns()
-    event[n].time = 1 + 2*random_1()
-    event[n].type = "prod"
-    event[n].number = n
     
 #structure of game
 #choose player, player takes turn
 #   launching fleets puts events in table
-#move clock ahead random time 0-2 turns
 #check for events
-#    planet prod spawns new prod event 1 turn later
+#    planet prod 
 #    fleets land
 #go back to choose player
 
 end_game = "no"
 while end_game != "yes":
+    # advance time
+    current_turn = current_turn + 1
+    # fleets land
+    for n in range (0, nof):
+        # find fleets ending their flight
+        if fleet[n].status = "infight" and fleet[n].arr < current_turn:
+            # fleet stops at world or location
+            if fleet[n].dest_wrld = 0:
+                # stops at location
+                fleet[n].locx = fleet[n].dest_x
+                fleet[n].locy = fleet[n].dest_y
+                fleet[n].locz = fleet[n].dest_z
+                fleet[n].status = "still"
+            else:
+                # stops at world
+                # is world owned by fleet's owner?
+                bp = 0
+                if planet[fleet[n].dest_wrld].owner =! fleet[n].owner:
+                    # planet owned by other player
+                    if planet[fleet[n].dest_wrld].owner =! "XXX":
+                        # fight for planet
+                        bp =  combat(fleet[n].ships, planet[fleet[n].dest_wrld].ships)
+                        if bp < 0:
+                            # invaders won battle
+                            planet[fleet[n].dest_wrld].ships = bp
+                        else:
+                            # invaders lost
+                            planet[fleet[n].dest_wrld].ships = bp * (-1)
+                # if won battle or planet is unowned, or owned by fleet owner
+                if bp >= 0:
+                    #set ownership, unload cargo
+                    planet[n].owner = fleet[n].owner
+                    if fleet[n].crg_type = "ap"
+                        planet[n].ap = planet[n].ap + fleet[n].cargo
+                    if fleet[n].crg_type = "pop"
+                        planet[n].pop = planet[n].pop + fleet[n].cargo
+                    if fleet[n].crg_type = "ind"
+                        planet[n].ind = planet[n].ind + fleet[n].cargo
+                if bp == 0:
+                    # there was no battle
+                    planet[fleet[n].dest_wrld].ships = fleet[n].ships
+                # fleet entry nulled out
+                fleet[n].status = "null"
+                fleet[n].ships = 0
+                fleet[n].cargo = 0
+                fleet[n].crg_type = "_"
+    # planets produce
     #choose new player
     pl = 1 + int(nop * random_1())
     if pl != t_player:
@@ -503,6 +533,7 @@ while end_game != "yes":
     else:
         ch2 = 0
         while ch2 != 1:
+            print("Turn = ", current_turn)
             print("1.  End Turn")
             print("2.  Display worlds")
             print("3.  Display Fleets")
@@ -522,10 +553,11 @@ while end_game != "yes":
             if ch2 == 6:
                 attack(player[t_tplayer], armada, nof)
             if ch2 == 7:
-                locations(worlds, armada, player[t_player])
+                locations(worlds, armada, player[t_player], nof)
             #other choices call functions
-        #still to check event table, process events
-        #test locations function
+        #still to do fleets land and production
+                # working on fleets landing
+                
              
 
 
