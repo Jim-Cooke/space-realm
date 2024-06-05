@@ -483,7 +483,7 @@ while end_game != "yes":
                     if planet[fleet[n].dest_wrld].owner =! "XXX":
                         # fight for planet
                         bp =  combat(fleet[n].ships, planet[fleet[n].dest_wrld].ships)
-                        if bp < 0:
+                        if bp > 0:
                             # invaders won battle
                             planet[fleet[n].dest_wrld].ships = bp
                         else:
@@ -508,6 +508,35 @@ while end_game != "yes":
                 fleet[n].cargo = 0
                 fleet[n].crg_type = "_"
     # planets produce
+    for n6 in range (1, nop*wpp+1):
+        if planet[n6].owner != "XXX":
+            # animals and plants inrease?
+            if planet[n6].ap * random_1() - planet[n6].ind * random_1() > 0:
+                planet[n6].ap = planet[n6].ap + 1
+            # resource production changes?
+            q6 = random_1()
+            if q6 > 0.9:
+                planet[n6].res_prod = planet[n6].res_prod + 1
+            if q6 < 0.1:
+                planet[n6].res_prod = planet[n6].res_prod - 1
+            # resource production cannot be less than 1
+            if planet[n6].res_prod < 1:
+                planet[n6].res_prod = 1
+            # resources increase
+            planet[n6].res = planet[n6].res + planet[n6].res_prod
+            # population consumes resources, increases or decreases
+            if planet[n6].res < planet[n6].pop:
+                planet[n6].res = 0
+                planet[n6].pop = planet[n6].pop - 1
+            if planet[n6].res == planet[n6].pop:
+                planet[n6].res = 0
+            if planet[n6].res > planet[n6].pop:
+               planet[n6].res = planet[n6].res -planet[n6].pop
+               planet[n6].pop = planet[n6].pop + 1 + int(planet[n6].pop * random_1())
+            # population cannot be les than 1
+            if planet[n6].pop < 1:
+                planet[n6].pop = 1
+            planet[n6].ind_prod = min(planet[n6].res, planet[n6].pop, planet[n6].ind)
     #choose new player
     pl = 1 + int(nop * random_1())
     if pl != t_player:
@@ -555,8 +584,7 @@ while end_game != "yes":
             if ch2 == 7:
                 locations(worlds, armada, player[t_player], nof)
             #other choices call functions
-        #still to do fleets land and production
-                # working on fleets landing
+       
                 
              
 
