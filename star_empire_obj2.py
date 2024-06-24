@@ -531,12 +531,27 @@ while end_game != "yes":
             if planet[n6].res == planet[n6].pop:
                 planet[n6].res = 0
             if planet[n6].res > planet[n6].pop:
-               planet[n6].res = planet[n6].res -planet[n6].pop
+               planet[n6].res = planet[n6].res - planet[n6].pop
                planet[n6].pop = planet[n6].pop + 1 + int(planet[n6].pop * random_1())
             # population cannot be les than 1
             if planet[n6].pop < 1:
                 planet[n6].pop = 1
             planet[n6].ind_prod = min(planet[n6].res, planet[n6].pop, planet[n6].ind)
+    # one planet moves
+    np = int(random_1() * nop) + 1
+    nd = int(random_1() * 6)
+    if nd == 0;
+        planet[nd].locx = planet[nd].locx + 1
+    else if nd == 1;
+        planet[nd].locx = planet[nd].locx - 1
+    else if nd == 2;
+        planet[nd].locy = planet[nd].locy + 1
+    else if nd == 3;
+        planet[nd].locy = planet[nd].locy - 1
+    else if nd == 4;
+        planet[nd].locz = planet[nd].locz + 1
+    else if nd == 5;
+        planet[nd].locz = planet[nd].locz - 1
     #choose new player
     pl = 1 + int(nop * random_1())
     if pl != t_player:
