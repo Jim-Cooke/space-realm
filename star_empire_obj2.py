@@ -120,7 +120,7 @@ def display_flt(armada, worlds, nof, num, df_player):
         ft_loc_line = '%4s %4s %4s' % (fleet[n].locx, fleet[n].locy, fleet[n].locz)
         if df_player == fleet[n].owner or local_fleet(armada, df_player, nof, fleet[n].locx, fleet[n].locy, fleet[n].locz) or \
         local_planet(worlds, num, df_player, fleet[n].locx, fleet[n].locy, fleet[n].locz): 
-            print(n, " ", fleet[n].owner, " ", ft_loc_line, " ", fleet[n].ships, " ", fleet[n].cargo, " ", fleet[n].crg_type)
+            print(n, " ", fleet[n].owner, " ", ft_loc_line, " ", fleet[n].ships, " ", fleet[n].cargo, " ", fleet[n].crg_type, fleet[n].status, fleet[n].arr)
 
             
 #display worlds function
@@ -217,7 +217,8 @@ def send_fleet(worlds, planets, guy, armada, nof, current_turn):
         while fl <= nof:
             if fl == nof:
             # all fleet entries were used
-                fleet.append[fl]
+                fleet.append(fl)
+                fleet[fl] = armada()
                 nof = nof + 1
                 break
             if fleet[fl].status == "null":
@@ -463,12 +464,13 @@ end_game = "no"
 while end_game != "yes":
     # advance time
     current_turn = current_turn + 1
+    print("time advance")
     # fleets land
     for n in range (0, nof):
         # find fleets ending their flight
-        if fleet[n].status = "infight" and fleet[n].arr < current_turn:
+        if fleet[n].status == "infight" and fleet[n].arr < current_turn:
             # fleet stops at world or location
-            if fleet[n].dest_wrld = 0:
+            if fleet[n].dest_wrld == 0:
                 # stops at location
                 fleet[n].locx = fleet[n].dest_x
                 fleet[n].locy = fleet[n].dest_y
@@ -478,9 +480,9 @@ while end_game != "yes":
                 # stops at world
                 # is world owned by fleet's owner?
                 bp = 0
-                if planet[fleet[n].dest_wrld].owner =! fleet[n].owner:
+                if planet[fleet[n].dest_wrld].owner != fleet[n].owner:
                     # planet owned by other player
-                    if planet[fleet[n].dest_wrld].owner =! "XXX":
+                    if planet[fleet[n].dest_wrld].owner != "XXX":
                         # fight for planet
                         bp =  combat(fleet[n].ships, planet[fleet[n].dest_wrld].ships)
                         if bp > 0:
@@ -493,11 +495,11 @@ while end_game != "yes":
                 if bp >= 0:
                     #set ownership, unload cargo
                     planet[n].owner = fleet[n].owner
-                    if fleet[n].crg_type = "ap"
+                    if fleet[n].crg_type == "ap":
                         planet[n].ap = planet[n].ap + fleet[n].cargo
-                    if fleet[n].crg_type = "pop"
+                    if fleet[n].crg_type == "pop":
                         planet[n].pop = planet[n].pop + fleet[n].cargo
-                    if fleet[n].crg_type = "ind"
+                    if fleet[n].crg_type == "ind":
                         planet[n].ind = planet[n].ind + fleet[n].cargo
                 if bp == 0:
                     # there was no battle
@@ -513,6 +515,7 @@ while end_game != "yes":
             # animals and plants inrease?
             if planet[n6].ap * random_1() - planet[n6].ind * random_1() > 0:
                 planet[n6].ap = planet[n6].ap + 1
+                print("ap increase")
             # resource production changes?
             q6 = random_1()
             if q6 > 0.9:
@@ -524,6 +527,7 @@ while end_game != "yes":
                 planet[n6].res_prod = 1
             # resources increase
             planet[n6].res = planet[n6].res + planet[n6].res_prod
+            print("resources increase")
             # population consumes resources, increases or decreases
             if planet[n6].res < planet[n6].pop:
                 planet[n6].res = 0
@@ -538,20 +542,21 @@ while end_game != "yes":
                 planet[n6].pop = 1
             planet[n6].ind_prod = min(planet[n6].res, planet[n6].pop, planet[n6].ind)
     # one planet moves
+    print("planet moves")
     np = int(random_1() * nop) + 1
     nd = int(random_1() * 6)
-    if nd == 0;
-        planet[nd].locx = planet[nd].locx + 1
-    else if nd == 1;
-        planet[nd].locx = planet[nd].locx - 1
-    else if nd == 2;
-        planet[nd].locy = planet[nd].locy + 1
-    else if nd == 3;
-        planet[nd].locy = planet[nd].locy - 1
-    else if nd == 4;
-        planet[nd].locz = planet[nd].locz + 1
-    else if nd == 5;
-        planet[nd].locz = planet[nd].locz - 1
+    if nd == 0:
+        planet[np].locx = planet[np].locx + 1
+    elif nd == 1:
+        planet[np].locx = planet[np].locx - 1
+    elif nd == 2:
+        planet[np].locy = planet[np].locy + 1
+    elif nd == 3:
+        planet[np].locy = planet[np].locy - 1
+    elif nd == 4:
+        planet[np].locz = planet[np].locz + 1
+    elif nd == 5:
+        planet[np].locz = planet[np].locz - 1
     #choose new player
     pl = 1 + int(nop * random_1())
     if pl != t_player:
@@ -599,6 +604,8 @@ while end_game != "yes":
             if ch2 == 7:
                 locations(worlds, armada, player[t_player], nof)
             #other choices call functions
+            #test if planets are actually increasing resources, etc
+                
        
                 
              
