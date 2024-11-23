@@ -53,7 +53,7 @@ for n in range (1, nop*wpp+1):
     planet[n].locx = int(random_1()*cube_side - cube_side/2)
     planet[n].locy = int(random_1()*cube_side - cube_side/2)
     planet[n].locz = int(random_1()*cube_side - cube_side/2)
-    planet[n].res_prod = int(random_1()*2 + 1)
+    planet[n].res_prod = int(random_1()*2 + 2)
     planet[n].res = int(random_1()*2 + 1)
     if planet[n].owner != "XXX":
         planet[n].ap = int(random_1()*2 + 1)
@@ -145,7 +145,10 @@ def display_wrld(armada, worlds, num, dw_player, nof):
 
 #build on worlds function
 def build(worlds, num, player):
-    p = int(input("Which world?"))
+    p = 0
+    while p < 1 or p > nop:
+        p = int(input("Which world?"))
+    
     if planet[p].owner == player:
         #  build things
         print("What to build?")
@@ -468,7 +471,8 @@ while end_game != "yes":
     # fleets land
     for n in range (0, nof):
         # find fleets ending their flight
-        if fleet[n].status == "infight" and fleet[n].arr < current_turn:
+        if fleet[n].status == "inflight" and fleet[n].arr < current_turn:
+            print("fleets land")
             # fleet stops at world or location
             if fleet[n].dest_wrld == 0:
                 # stops at location
@@ -479,31 +483,32 @@ while end_game != "yes":
             else:
                 # stops at world
                 # is world owned by fleet's owner?
+                dw = fleet[n].dest_wrld
                 bp = 0
-                if planet[fleet[n].dest_wrld].owner != fleet[n].owner:
+                if planet[dw].owner != fleet[n].owner:
                     # planet owned by other player
-                    if planet[fleet[n].dest_wrld].owner != "XXX":
+                    if planet[dw].owner != "XXX":
                         # fight for planet
-                        bp =  combat(fleet[n].ships, planet[fleet[n].dest_wrld].ships)
+                        bp =  combat(fleet[n].ships, planet[dw].ships)
                         if bp > 0:
                             # invaders won battle
-                            planet[fleet[n].dest_wrld].ships = bp
+                            planet[dw].ships = bp
                         else:
                             # invaders lost
-                            planet[fleet[n].dest_wrld].ships = bp * (-1)
+                            planet[dw].ships = bp * (-1)
                 # if won battle or planet is unowned, or owned by fleet owner
                 if bp >= 0:
                     #set ownership, unload cargo
-                    planet[n].owner = fleet[n].owner
+                    planet[dw].owner = fleet[n].owner
                     if fleet[n].crg_type == "ap":
-                        planet[n].ap = planet[n].ap + fleet[n].cargo
+                        planet[dw].ap = planet[dw].ap + fleet[n].cargo
                     if fleet[n].crg_type == "pop":
-                        planet[n].pop = planet[n].pop + fleet[n].cargo
+                        planet[dw].pop = planet[dw].pop + fleet[n].cargo
                     if fleet[n].crg_type == "ind":
-                        planet[n].ind = planet[n].ind + fleet[n].cargo
+                        planet[dw].ind = planet[dw].ind + fleet[n].cargo
                 if bp == 0:
                     # there was no battle
-                    planet[fleet[n].dest_wrld].ships = fleet[n].ships
+                    planet[dw].ships = fleet[n].ships
                 # fleet entry nulled out
                 fleet[n].status = "null"
                 fleet[n].ships = 0
@@ -559,16 +564,10 @@ while end_game != "yes":
         planet[np].locz = planet[np].locz - 1
     #choose new player
     pl = 1 + int(nop * random_1())
-    if pl != t_player:
-        t_player = pl
-    else:
-        least_turns = current_turn + 1
-        least_pl = 1
-        for n in range (1, nop+1):
-            if turns[n] < least_turns:
-                least_turns = turns[n]
-                least_pl = n
-        t_player = least_pl
+    while pl == t_player:
+        pl = 1 + int(nop * random_1())
+    t_player = pl
+    
     # menu
     ch = 0
     while ch != 1 and ch != 2:
